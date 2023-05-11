@@ -298,7 +298,7 @@ func (n *Hasher) HashNode(left, right []byte) ([]byte, error) {
 	data = append(data, left...)
 	data = append(data, right...)
 	//nolint:errcheck
-	fmt.Printf("len(data): %v, data %v\n", len(data), data) // len(data): 197, data [1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]
+	fmt.Printf("namespaceSize: %v len(data): %v\n", n.NamespaceLen, len(data))
 	h.Write(data)
 	return h.Sum(res), nil
 }

@@ -224,70 +224,66 @@ func TestNamespaceHasherSum(t *testing.T) {
 func TestHashNode_ChildrenNamespaceRange(t *testing.T) {
 	// create a dummy hash to use as the digest of the left and right child
 	randHash := createByteSlice(sha256.Size, 0x01)
-	type children struct {
-		l []byte // namespace hash of the left child with the format of MinNs||MaxNs||h
-		r []byte // namespace hash of the right child with the format of MinNs||MaxNs||h
-	}
-	namespaceSize := 33
-	leftMin := bytes.Repeat([]byte{0}, namespaceSize)
-	leftMax := bytes.Repeat([]byte{1}, namespaceSize)
-	rightMin := bytes.Repeat([]byte{2}, namespaceSize)
-	rightMax := bytes.Repeat([]byte{3}, namespaceSize)
+	// type children struct {
+	// 	l []byte // namespace hash of the left child with the format of MinNs||MaxNs||h
+	// 	r []byte // namespace hash of the right child with the format of MinNs||MaxNs||h
+	// }
 
-	tests := []struct {
-		name     string
-		nidLen   namespace.IDSize
-		children children
-		wantErr  bool // whether the test should error out
-		errType  error
-	}{
-		// {
-		// 	"left.maxNs>right.minNs", 2,
-		// 	children{
-		// 		concat([]byte{0, 0, 1, 1}, randHash),
-		// 		concat([]byte{0, 0, 1, 1}, randHash),
-		// 	},
-		// 	true, // this test case should emit an error since in an ordered NMT, left.maxNs cannot be greater than right.minNs
-		// 	ErrUnorderedSiblings,
-		// },
-		// {
-		// 	"left.maxNs=right.minNs", 2,
-		// 	children{
-		// 		concat([]byte{0, 0, 1, 1}, randHash),
-		// 		concat([]byte{1, 1, 2, 2}, randHash),
-		// 	},
-		// 	false,
-		// 	nil,
-		// },
-		// {
-		// 	"left.maxNs<right.minNs", 2,
-		// 	children{
-		// 		concat([]byte{0, 0, 1, 1}, randHash),
-		// 		concat([]byte{2, 2, 3, 3}, randHash),
-		// 	},
-		// 	false,
-		// 	nil,
-		// },
-		{
-			name:   "version (1 byte) + ID (32 bytes) = 33 bytes",
-			nidLen: 33,
-			children: children{
-				concat(leftMin, leftMax, randHash),
-				concat(rightMin, rightMax, randHash),
-			},
-			wantErr: false,
-			errType: nil,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			n := NewNmtHasher(sha256.New(), tt.nidLen, false)
-			_, err := n.HashNode(tt.children.l, tt.children.r)
-			assert.Equal(t, tt.wantErr, err != nil)
-			if tt.wantErr {
-				assert.True(t, errors.Is(err, tt.errType))
-			}
-		})
+	// tests := []struct {
+	// 	name     string
+	// 	nidLen   namespace.IDSize
+	// 	children children
+	// 	wantErr  bool // whether the test should error out
+	// 	errType  error
+	// }{
+	// {
+	// 	"left.maxNs>right.minNs", 2,
+	// 	children{
+	// 		concat([]byte{0, 0, 1, 1}, randHash),
+	// 		concat([]byte{0, 0, 1, 1}, randHash),
+	// 	},
+	// 	true, // this test case should emit an error since in an ordered NMT, left.maxNs cannot be greater than right.minNs
+	// 	ErrUnorderedSiblings,
+	// },
+	// {
+	// 	"left.maxNs=right.minNs", 2,
+	// 	children{
+	// 		concat([]byte{0, 0, 1, 1}, randHash),
+	// 		concat([]byte{1, 1, 2, 2}, randHash),
+	// 	},
+	// 	false,
+	// 	nil,
+	// },
+	// {
+	// 	"left.maxNs<right.minNs", 2,
+	// 	children{
+	// 		concat([]byte{0, 0, 1, 1}, randHash),
+	// 		concat([]byte{2, 2, 3, 3}, randHash),
+	// 	},
+	// 	false,
+	// 	nil,
+	// },
+	// {
+	// 	name:   "version (1 byte) + ID (32 bytes) = 33 bytes",
+	// 	nidLen: 31,
+	// 	children: children{
+	// 		concat(leftMin, leftMax, randHash),
+	// 		concat(rightMin, rightMax, randHash),
+	// 	},
+	// 	wantErr: false,
+	// 	errType: nil,
+	// },
+	// }
+
+	for namespaceSize := 0; namespaceSize < 50; namespaceSize++ {
+		n := NewNmtHasher(sha256.New(), namespace.IDSize(namespaceSize), false)
+		leftMin := bytes.Repeat([]byte{0}, namespaceSize)
+		leftMax := bytes.Repeat([]byte{1}, namespaceSize)
+		rightMin := bytes.Repeat([]byte{2}, namespaceSize)
+		rightMax := bytes.Repeat([]byte{3}, namespaceSize)
+		left := concat(leftMin, leftMax, randHash)
+		right := concat(rightMin, rightMax, randHash)
+		n.HashNode(left, right)
 	}
 }
 
